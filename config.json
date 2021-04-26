@@ -1,0 +1,5 @@
+{
+    "target_language": "ansi-c",
+    "real-implementation": "double",
+    "output_directory": "./"
+}
