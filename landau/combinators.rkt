@@ -223,7 +223,7 @@
 #'(string-append (offset-string (offset)) decl-str)))
 
 (define (prepand-headers src-str)
-  (format "#include <math.h>\n#include \"../qd/c_dd.h\"\n\n~a" src-str)
+  (format "#include <math.h>\n#include \"../qd/include/qd/c_dd.h\"\n\n~a" src-str)
 )
 
 (define/contract
