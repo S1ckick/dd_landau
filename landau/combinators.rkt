@@ -10,7 +10,6 @@
          "target-config.rkt")
 
 (provide (all-defined-out))
-
 (define indent-step 2)
 (define offset (make-parameter 0))
 (define (offset-string level) (make-string (fx* level indent-step) #\ ))
@@ -122,7 +121,7 @@
           return-type
           name
           return-value
-          args 
+          args
           (parameterize ((offset (+ (offset) 1)))
                         (call-with-parameterization (current-parameterization) body))))
 
@@ -145,8 +144,8 @@
 
 (define (to-string x)
   (if (extflonum? x)
-    ;; NOTE: print extflonum as double. Need for C backend 
-    (string-replace (format "~a" x) "t" "e") 
+    ;; NOTE: print extflonum as double. Need for C backend
+    (string-replace (format "~a" x) "t" "e")
     (format "~a" x)))
 
 (define (c-make-array values-list)
@@ -158,8 +157,18 @@
            (vector->list (vector-map! number->string vec)) ", ")))
 
 (define (c-set-array symb idx value)
+  (displayln value)
   (let ((indentation (offset-string (offset))))
-    (format "~a~a[~a] = ~a;\n" indentation symb idx value)))
+    (match (target-real-implementation TARGET)
+           ('double (format "~a~a[~a] = ~a;\n" indentation symb idx value))
+           ('long-double (format "~a~a[~a] = ~a;\n" indentation symb idx value))
+           ('double-double
+           (if (string=? value "0.0")
+           (format "~a~a[~a][0] = ~a;\n~a~a[~a][1] = ~a;\n" indentation symb idx value indentation symb idx value)
+           (format "~a~a[~a][0] = ~a[0];\n~a~a[~a][1] = ~a[1];\n" indentation symb idx value indentation symb idx value))
+           )
+    )
+    ))
 
 (define (c-set symb value)
   (let ((indentation (offset-string (offset))))
@@ -168,20 +177,22 @@
 (define (c-dereference pointer-symb)
   (format "*~a" pointer-symb))
 
-(define c-real-type target-real-implementation)
-  (cond
-    [ (equal? target-real-implementation "double") "double" ]
-    [ (equal? target-real-implementation "long-double") "long double"]
-    [ (equal? target-real-implementation "double-double") "dd_real"])
+(define c-real-type
+(match (target-real-implementation TARGET)
+       ('double "double")
+       ('long-double "long double")
+       ('double-double "double*")
+))
 
 (define c-zero-filled-array "{ 0.0 }")
 
+
 (define (c-exact->inexact value)
-  (cond
-    [(equal? target-real-implementation "double") (format "((double) ~a)" value)]
-    [(equal? target-real-implementation "long-double") (format "((long double) ~a)" value)]
-    [(equal? target-real-implementation "double-double") (format "((dd_real) ~a)" value)]
-    ))
+(match (target-real-implementation TARGET)
+       ('double (format "((double) ~a)" value))
+       ('long-double (format "((long double) ~a)" value))
+       ('double-double (format "((double *) ~a)" value))
+))
 
 ;; FIXME use runtime
 (define (to-c-decl landau-parsed-type name-str [value #'#f])
@@ -199,11 +210,11 @@
       [(list 'dual-l '()) (if value
                             #`(format "double ~a = ~a;\n" #,name-str #,value)
                             #`(format "double ~a;\n" #,name-str))]
-    
+
       [else (error (format "bug: unsupported type: ~a" landau-parsed-type))])))
 #'(string-append (offset-string (offset)) decl-str))))
 
-(define (to-c-der-decl df-type dx-size name-str)  
+(define (to-c-der-decl df-type dx-size name-str)
   (with-syntax ((decl-str (match df-type
          [(list 'dual-l (list size)) #`(format "static double ~a[~a];\n" #,name-str (fx* #,size #,dx-size))]
          [(list 'real (list size)) #`(format "static double ~a[~a];\n" #,name-str (fx* #,size #,dx-size))]
@@ -212,18 +223,23 @@
 #'(string-append (offset-string (offset)) decl-str)))
 
 (define (prepand-headers src-str)
-  (format "#include <math.h>\n\n~a" src-str))
+  (format "#include <math.h>\n#include \"../qd/c_dd.h\"\n\n~a" src-str)
+)
 
 (define/contract
   (c-declare-var name-str type (modifier-pragma 'on-stack) (value #f) (const? #f))
   (->* (string? landau-type/c) (any/c any/c boolean?)
        string?)
   (let* ((target_ TARGET)
-         (c-real-type (if (target-extfloat? target_) "long double" "double"))
+         (c-real-type (match (target-real-implementation TARGET)
+                ('double "double")
+                ('long-double "long double")
+                ('double-double "double")
+         ))
          (indentation (offset-string (offset)))
          ;; NOTE: all real arrays are on stack
          (modifier (match modifier-pragma
-                     ('static "static ") 
+                     ('static "static ")
                      ('on-stack "")))
          (const-modifier (if const?
                            "const "
@@ -234,8 +250,16 @@
                       (list 'dual-l (list size)))
                   (let ((arr-value (if value
                                      value
-                                     "{ 0.0 }")))
-                    (format "~a~a~a ~a[~a] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value)))
+                                     (match (target-real-implementation TARGET)
+                                     ('double "{ 0.0 }")
+                                     ('long-double "{ 0.0 }")
+                                     ('double-double "{{ 0.0 , 0.0 }}"))
+                                     )))
+                    (match (target-real-implementation TARGET)
+                    ('double (format "~a~a~a ~a[~a] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value))
+                    ('long-double (format "~a~a~a ~a[~a] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value))
+                    ('double-double (format "~a~a~a ~a[~a][2] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value))
+                    )))
 
                  ((list 'int (list size))
                   (let ((arr-value (if value
@@ -263,7 +287,11 @@
     value))
 
 (define (to-c-func-param landau-parsed-type name-str target (is-return-variable? #f))
-  (let ((target-real (if (target-extfloat? target) "long double" "double")))
+  (let ((target-real (match (target-real-implementation TARGET)
+         ('double "double")
+         ('long-double "long double")
+         ('double-double "double*")
+  )))
     (match landau-parsed-type
     [(list 'real '()) (if is-return-variable? ;; Function returns using mutation
                         (format "~a* ~a" target-real name-str)
@@ -276,11 +304,10 @@
     [else (error (format "bug: unsupported type: ~a" landau-parsed-type))])))
 
 
-(define/contract 
+(define/contract
   (c-func-arg-decl argnames args-list)
-  (-> syntax? (listof any/c) 
+  (-> syntax? (listof any/c)
       string?)
   (if (null? (syntax-e argnames))
     ""
     (string-append ", " (string-join args-list ", "))))
-

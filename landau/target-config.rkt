@@ -3,7 +3,7 @@
          racket/contract
          json)
 
-(provide target/c lang/c real-implementation/c TARGET target-lang target-real-implementation target-c-out-path)
+(provide target/c lang/c TARGET target-lang target-real-implementation target-c-out-path)
 
 (struct target
     (lang
@@ -66,13 +66,18 @@
         (unless (string? real-implementation)
                 (raise-type-error 'real-implementation "string" real-implementation))
 
+        (unless (real-implementation/c  (string->symbol real-implementation))
+                (error (format
+                        "target_real-implementation should be one of: \"double\", \"double-double\", \"long-double\". Given: \"~a\""
+                        (string->symbol real-implementation))))
+
         (unless (string? path)
                 (raise-type-error 'output_directory "path" path))
 
         (define c-output-resolved-path (resolve-path path))
 
         (target (string->symbol lang)
-                real-implementation
+                (string->symbol real-implementation)
                 c-output-resolved-path)))
 
 (define/contract (override-with-command-line cfg-target)
@@ -86,9 +91,9 @@
                               'ansi-c
                               config-target-lang))
          (final-target-real-implementation (cond
-                                  [(vector-member "-d" args) 'double]
+                                  [(vector-member "-td" args) 'double-double]
                                   [(vector-member "-ld" args) 'long-double]
-                                  [(vector-member "-dd" args) 'double-double]
+                                  [(vector-member "-d" args) 'double]
                                   [else config-target-real-implementation])))
         (target final-target-lang
                 final-target-real-implementation

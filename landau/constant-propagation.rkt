@@ -10,14 +10,14 @@
    "target-config.rkt"
    "environment.rkt")
 
-(provide rl0.0 rl* rl/ rl+ rl- rl-neg rl-sin 
-         rl-cos ->rl inexact->rl rl-sqrt 
+(provide rl0.0 rl* rl/ rl+ rl- rl-neg rl-sin
+         rl-cos ->rl inexact->rl rl-sqrt
          rl-sqr rl-expt rl-vector-ref
          list->rl-vector make-rl-vector any-number?)
 
 (define rl0.0
   (if (equal? target-real-implementation "double")
-     0.0
+     null
      0.0t0))
 
 (define rl*
@@ -100,7 +100,7 @@
                       (atom-number x)))))
 
 (define (normilize-rl rl)
-  (if (and (equal? 'racket (target-lang TARGET)) 
+  (if (and (equal? 'racket (target-lang TARGET))
            (equal? target-real-implementation "double"))
     #'rl
     #'(format "~a" rl)))
@@ -109,4 +109,3 @@
   (if (equal? target-real-implementation "double")
     (number? n)
     (or (extflonum? n) (number? n))))
-

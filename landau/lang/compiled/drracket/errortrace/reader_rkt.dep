@@ -1,0 +1,1 @@
+("7.9" racket ("b6427720df15f0bfa7a729aaf0c3648f0b32024c" . "d61eddb7cdad55cf1f34a0e654fa1f89d1b31e58") (collects #"errortrace" #"errortrace-key.rkt") (collects #"landau" #"grammar.rkt") (collects #"landau" #"lexer.rkt") (collects #"racket" #"runtime-config.rkt") (collects #"s-exp" #"lang" #"reader.rkt") (collects #"syntax" #"module-reader.rkt"))
