@@ -172,16 +172,16 @@ int xdot(dd *restrict xdot11, dd *restrict x12, dd GM13) {
     mapped_idx = loop_var46;
     int al_index_name_symbol;
     al_index_name_symbol = ddist3inv534dGM_mpg18[loop_var46];
-    ddist3inv534dGM_der41[mapped_idx] = c_dd_mul(-1.0 , c_dd_mul(1.0e0 , c_dd_mul(c_dd_div(1.0 / (c_dd_mul(dist240 , sqrt(dist240)) * c_dd_mul(dist240 , sqrt(dist240)))) , c_dd_add(c_dd_mul(dist240 , c_dd_mul(0.5 , c_dd_mul(sqrt(c_dd_div(1.0 / dist240)) , ddist2521dGM_der38[al_index_name_symbol]))) , c_dd_mul(sqrt(dist240) , ddist2521dGM_der38[al_index_name_symbol])))));
+    ddist3inv534dGM_der41[mapped_idx] = c_dd_mul(-1.0 , c_dd_mul(1.0e0 , c_dd_mul(c_dd_div(1.0 , (c_dd_mul(dist240 , sqrt(dist240)) * c_dd_mul(dist240 , sqrt(dist240)))) , c_dd_add(c_dd_mul(dist240 , c_dd_mul(0.5 , c_dd_mul(sqrt(c_dd_div(1.0 , dist240)) , ddist2521dGM_der38[al_index_name_symbol]))) , c_dd_mul(sqrt(dist240) , ddist2521dGM_der38[al_index_name_symbol])))));
   }
   for (int loop_var47 = 0; loop_var47 < 6; loop_var47++) {
     int mapped_idx;
     mapped_idx = loop_var47;
     int al_index_name_symbol;
     al_index_name_symbol = ddist3inv534dinitial_mpg26[loop_var47];
-    ddist3inv534dinitial_der42[mapped_idx] = c_dd_mul(-1.0 , c_dd_mul(1.0e0 , c_dd_mul(c_dd_div(1.0 / (c_dd_mul(dist240 , sqrt(dist240)) * c_dd_mul(dist240 , sqrt(dist240)))) , c_dd_add(c_dd_mul(dist240 , c_dd_mul(0.5 , c_dd_mul(sqrt(c_dd_div(1.0 / dist240)) , ddist2521dinitial_der39[al_index_name_symbol]))) , c_dd_mul(sqrt(dist240) , ddist2521dinitial_der39[al_index_name_symbol])))));
+    ddist3inv534dinitial_der42[mapped_idx] = c_dd_mul(-1.0 , c_dd_mul(1.0e0 , c_dd_mul(c_dd_div(1.0 , (c_dd_mul(dist240 , sqrt(dist240)) * c_dd_mul(dist240 , sqrt(dist240)))) , c_dd_add(c_dd_mul(dist240 , c_dd_mul(0.5 , c_dd_mul(sqrt(c_dd_div(1.0 , dist240)) , ddist2521dinitial_der39[al_index_name_symbol]))) , c_dd_mul(sqrt(dist240) , ddist2521dinitial_der39[al_index_name_symbol])))));
   }
-  dist3inv43 = c_dd_div_d_dd(1.0e0 / c_dd_mul(dist240 , sqrt(dist240)));
+  dist3inv43 = c_dd_div_d_dd(1.0e0 , c_dd_mul(dist240 , sqrt(dist240)));
   for (int slice_idx = 0; slice_idx < 3; slice_idx++) {
     for (int mapped_idx = 0;; mapped_idx++) {
       int mappings_full_idx_symbol;

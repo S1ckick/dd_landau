@@ -167,7 +167,6 @@
 (define-syntax (_set! stx)
   (syntax-parse stx
                 ((_set! var value)
-                (displayln #'value)
                  (match (target-lang TARGET)
                    ('racket
                     (syntax/loc stx (set! var value)))
@@ -337,7 +336,6 @@
 (define-syntax (_rl* stx)
   (syntax-parse stx
                 ((_ x y)
-                (displayln #'x)
                  (match (target-lang TARGET)
                    ('racket
                     (quasisyntax/loc stx (#,(match (target-real-implementation TARGET) ('double #'fl*) ('long-double #'extfl*)) x y)))

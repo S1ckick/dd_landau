@@ -520,7 +520,6 @@
            (cond
              ((or (equal? type 'real) (is-slice-of-type 'real type))
               (begin
-                (displayln (and expr1-atom (not expr2-atom)))
                (cond
                  [(and expr1-atom expr2-atom) (is-type_ type (quasisyntax/loc stx #,((if (equal? op "*") rl* rl/) expr1-atom expr2-atom)))]
                  [(and expr1-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "*") #'_rldl* #'_rldl/) ,expr1-atom ,expr2)))]
