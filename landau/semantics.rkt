@@ -48,7 +48,7 @@
          _if _if-stm _begin _for _forever _let _let-int _define-var _define-var-with-func-call _decl-real-func _pure-func-call
          _not _or _and _equal?
          _int+ _int- _int* _int/ _int-neg _int= _int> _int>= _int<= _int<
-         _rl+ _rld+ _rl- _rl* _rl/ _rl-neg
+         _rl+ _rldl+ _rldr+ _rl- _rldl- _rldr- _rl* _rldl* _rldr* _rl/ _rldl/ _rldr/ _rl-neg
          _exact->inexact
          _rl-vector _vector-ref _int-vector-ref _var-ref _vector-set! _set! _func-call
          _sin _cos _expt _sqr _sqrt
@@ -386,8 +386,8 @@
         ((or (equal? type 'real) (is-slice-of-type 'real type))
          (cond
            [(and expr1-atom expr2-atom) (is-type_ type (quasisyntax/loc stx #,((if (equal? op "+") rl+ rl-) expr1-atom expr2-atom)))]
-           [(expr1-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "+") #'_rld+ #'_rl-) ,expr1-atom ,expr2)))]
-           [(expr2-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "+") #'_rld+ #'_rl-) ,expr2-atom ,expr1)))]
+           [(and expr1-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "+") #'_rldl+ #'_rldl-) ,expr1-atom ,expr2)))]
+           [(and expr2-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "+") #'_rldr+ #'_rldr-) ,expr1 ,expr2-atom)))]
            [else (is-type_ type (datum->syntax stx `(,(if (equal? op "+") #'_rl+ #'_rl-) ,expr1 ,expr2)))] ) )
         ((equal? type 'int)
          (is-type_ type
@@ -520,12 +520,13 @@
            (cond
              ((or (equal? type 'real) (is-slice-of-type 'real type))
               (begin
-               (if (and expr1-atom expr2-atom)
-                  (is-type_ type
-                     (quasisyntax/loc stx #,((if (equal? op "*") rl* rl/) expr1-atom expr2-atom)))
-                  (is-type_ type
-                         (datum->syntax stx
-                            `(,(if (equal? op "*") #'_rl* #'_rl/) ,expr1 ,expr2))))))
+                (displayln (and expr1-atom (not expr2-atom)))
+               (cond
+                 [(and expr1-atom expr2-atom) (is-type_ type (quasisyntax/loc stx #,((if (equal? op "*") rl* rl/) expr1-atom expr2-atom)))]
+                 [(and expr1-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "*") #'_rldl* #'_rldl/) ,expr1-atom ,expr2)))]
+                 [(and expr2-atom) (is-type_ type (datum->syntax stx `(,(if (equal? op "*") #'_rldr* #'_rldr/) ,expr1 ,expr2-atom)))]
+                 [else (is-type_ type (datum->syntax stx `(,(if (equal? op "*") #'_rl* #'_rl/) ,expr1 ,expr2)))]
+                 )))
              ;; NOTE: Threre are no int slices yet
              ((equal? type 'int)
               (is-int
