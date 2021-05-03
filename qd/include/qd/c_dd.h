@@ -20,76 +20,81 @@
 extern "C" {
 #endif
 
+typedef struct{
+  double x;
+  double y;
+} dd;
+
 /* add */
-void c_dd_add(const double *a, const double *b, double *c);
-void c_dd_add_d_dd(double a, const double *b, double *c);
-void c_dd_add_dd_d(const double *a, double b, double *c);
+dd c_dd_add(const double *a, const double *b);
+dd c_dd_add_d_dd(double a, const double *b);
+dd c_dd_add_dd_d(const double *a, double b);
 
 /* sub */
-void c_dd_sub(const double *a, const double *b, double *c);
-void c_dd_sub_d_dd(double a, const double *b, double *c);
-void c_dd_sub_dd_d(const double *a, double b, double *c);
+dd c_dd_sub(const double *a, const double *b);
+dd c_dd_sub_d_dd(double a, const double *b);
+dd c_dd_sub_dd_d(const double *a, double b);
 
 /* mul */
-void c_dd_mul(const double *a, const double *b, double *c);
-void c_dd_mul_d_dd(double a, const double *b, double *c);
-void c_dd_mul_dd_d(const double *a, double b, double *c);
+dd c_dd_mul(const double *a, const double *b);
+dd c_dd_mul_d_dd(double a, const double *b);
+dd c_dd_mul_dd_d(const double *a, double b);
 
 /* div */
-void c_dd_div(const double *a, const double *b, double *c);
-void c_dd_div_d_dd(double a, const double *b, double *c);
-void c_dd_div_dd_d(const double *a, double b, double *c);
+dd c_dd_div(const double *a, const double *b);
+dd c_dd_div_d_dd(double a, const double *b);
+dd c_dd_div_dd_d(const double *a, double b);
 
 /* copy */
-void c_dd_copy(const double *a, double *b);
-void c_dd_copy_d(double a, double *b);
+dd c_dd_copy(const double *a);
+dd c_dd_copy_d(double a);
 
-void c_dd_sqrt(const double *a, double *b);
-void c_dd_sqr(const double *a, double *b);
+dd c_dd_sqrt(const double *a);
+dd c_dd_sqr(const double *a);
 
-void c_dd_abs(const double *a, double *b);
+dd c_dd_abs(const double *a);
 
-void c_dd_npwr(const double *a, int b, double *c);
-void c_dd_nroot(const double *a, int b, double *c);
+dd c_dd_npwr(const double *a, int b);
+dd c_dd_nroot(const double *a, int b);
 
-void c_dd_nint(const double *a, double *b);
-void c_dd_aint(const double *a, double *b);
-void c_dd_floor(const double *a, double *b);
-void c_dd_ceil(const double *a, double *b);
+dd c_dd_nint(const double *a);
+dd c_dd_aint(const double *a);
+dd c_dd_floor(const double *a);
+dd c_dd_ceil(const double *a);
 
-void c_dd_exp(const double *a, double *b);
-void c_dd_log(const double *a, double *b);
-void c_dd_log10(const double *a, double *b);
+dd c_dd_exp(const double *a);
+dd c_dd_log(const double *a);
+dd c_dd_log10(const double *a);
 
-void c_dd_sin(const double *a, double *b);
-void c_dd_cos(const double *a, double *b);
-void c_dd_tan(const double *a, double *b);
+dd c_dd_sin(const double *a);
+dd c_dd_cos(const double *a);
+dd c_dd_tan(const double *a);
 
-void c_dd_asin(const double *a, double *b);
-void c_dd_acos(const double *a, double *b);
-void c_dd_atan(const double *a, double *b);
-void c_dd_atan2(const double *a, const double *b, double *c);
+dd c_dd_asin(const double *a);
+dd c_dd_acos(const double *a);
+dd c_dd_atan(const double *a);
+dd c_dd_atan2(const double *a, const double *b);
 
-void c_dd_sinh(const double *a, double *b);
-void c_dd_cosh(const double *a, double *b);
-void c_dd_tanh(const double *a, double *b);
+dd c_dd_sinh(const double *a);
+dd c_dd_cosh(const double *a);
+dd c_dd_tanh(const double *a);
 
-void c_dd_asinh(const double *a, double *b);
-void c_dd_acosh(const double *a, double *b);
-void c_dd_atanh(const double *a, double *b);
+dd c_dd_asinh(const double *a);
+dd c_dd_acosh(const double *a);
+dd c_dd_atanh(const double *a);
 
-void c_dd_sincos(const double *a, double *s, double *c);
-void c_dd_sincosh(const double *a, double *s, double *c);
+dd c_dd_sincos(const double *a, double *s, double *c);
+dd c_dd_sincosh(const double *a, double *s, double *c);
 
-void c_dd_read(const char *s, double *a);
+dd c_dd_read(const char *s);
 void c_dd_swrite(const double *a, int precision, char *s, int len);
 void c_dd_write(const double *a);
-void c_dd_neg(const double *a, double *b);
-void c_dd_rand(double *a);
-void c_dd_comp(const double *a, const double *b, int *result);
-void c_dd_comp_dd_d(const double *a, double b, int *result);
-void c_dd_comp_d_dd(double a, const double *b, int *result);
-void c_dd_pi(double *a);
+dd c_dd_neg(const double *a);
+dd c_dd_rand();
+dd c_dd_comp(const double *a, const double *b);
+dd c_dd_comp_dd_d(const double *a, double b);
+dd c_dd_comp_d_dd(double a, const double *b);
+dd c_dd_pi();
 
 #ifdef __cplusplus
 }

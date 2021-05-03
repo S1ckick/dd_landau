@@ -15,8 +15,11 @@
 (define (offset-string level) (make-string (fx* level indent-step) #\ ))
 
 (define (c+ . x) (format "(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " + ")))
+(define (cr+ . x) (format "c_dd_add(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (crd+ . x) (format "c_dd_add_d_dd(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
 (define (c- x y) (format "(~a - ~a)" x y))
 (define (c* . x) (format "(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " * ")))
+(define (cr* . x) (format "c_dd_mul(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
 (define (c/ x y) (format "(~a / ~a)" x y))
 (define (c< x y) (format "(~a < ~a)" x y))
 (define (c> x y) (format "(~a > ~a)" x y))
@@ -157,16 +160,11 @@
            (vector->list (vector-map! number->string vec)) ", ")))
 
 (define (c-set-array symb idx value)
-  (displayln value)
   (let ((indentation (offset-string (offset))))
     (match (target-real-implementation TARGET)
            ('double (format "~a~a[~a] = ~a;\n" indentation symb idx value))
            ('long-double (format "~a~a[~a] = ~a;\n" indentation symb idx value))
-           ('double-double
-           (if (string=? value "0.0")
-           (format "~a~a[~a][0] = ~a;\n~a~a[~a][1] = ~a;\n" indentation symb idx value indentation symb idx value)
-           (format "~a~a[~a][0] = ~a[0];\n~a~a[~a][1] = ~a[1];\n" indentation symb idx value indentation symb idx value))
-           )
+           ('double-double (format "~a~a[~a] = ~a;\n" indentation symb idx value))
     )
     ))
 
@@ -181,7 +179,7 @@
 (match (target-real-implementation TARGET)
        ('double "double")
        ('long-double "long double")
-       ('double-double "double*")
+       ('double-double "dd")
 ))
 
 (define c-zero-filled-array "{ 0.0 }")
@@ -234,7 +232,7 @@
          (c-real-type (match (target-real-implementation TARGET)
                 ('double "double")
                 ('long-double "long double")
-                ('double-double "double")
+                ('double-double "dd")
          ))
          (indentation (offset-string (offset)))
          ;; NOTE: all real arrays are on stack
@@ -253,12 +251,12 @@
                                      (match (target-real-implementation TARGET)
                                      ('double "{ 0.0 }")
                                      ('long-double "{ 0.0 }")
-                                     ('double-double "{{ 0.0 , 0.0 }}"))
+                                     ('double-double "{ 0.0 }"))
                                      )))
                     (match (target-real-implementation TARGET)
                     ('double (format "~a~a~a ~a[~a] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value))
                     ('long-double (format "~a~a~a ~a[~a] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value))
-                    ('double-double (format "~a~a~a ~a[~a][2] = ~a;\n" modifier const-modifier c-real-type name-str size arr-value))
+                    ('double-double (format "~a~a~a ~a[~a];\n" modifier const-modifier c-real-type name-str size))
                     )))
 
                  ((list 'int (list size))
@@ -290,7 +288,7 @@
   (let ((target-real (match (target-real-implementation TARGET)
          ('double "double")
          ('long-double "long double")
-         ('double-double "double*")
+         ('double-double "dd")
   )))
     (match landau-parsed-type
     [(list 'real '()) (if is-return-variable? ;; Function returns using mutation

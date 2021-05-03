@@ -165,9 +165,9 @@
                                            ))))))))
 
 (define-syntax (_set! stx)
-  (displayln stx)
   (syntax-parse stx
                 ((_set! var value)
+                (displayln #'value)
                  (match (target-lang TARGET)
                    ('racket
                     (syntax/loc stx (set! var value)))
@@ -337,11 +337,12 @@
 (define-syntax (_rl* stx)
   (syntax-parse stx
                 ((_ x y)
+                (displayln #'x)
                  (match (target-lang TARGET)
                    ('racket
                     (quasisyntax/loc stx (#,(match (target-real-implementation TARGET) ('double #'fl*) ('long-double #'extfl*)) x y)))
                    ('ansi-c
-                    (syntax/loc stx (c* (to-string x) (to-string y))))))
+                    (syntax/loc stx (cr* (to-string x) (to-string y))))))
                 ((_ x rest ...)
                  (match (target-lang TARGET)
                    ('racket
@@ -349,7 +350,7 @@
                      stx
                      (#,(match (target-real-implementation TARGET) ('double #'fl*) ('long-double #'extfl*)) x (_rl* #,@#'(rest ...)))))
                    ('ansi-c
-                    (quasisyntax/loc stx (c* (to-string x) (_rl* #,@#'(rest ...)))))))))
+                    (quasisyntax/loc stx (cr* (to-string x) (_rl* #,@#'(rest ...)))))))))
 
 (define-syntax (_rl+ stx)
   (syntax-parse stx
@@ -358,7 +359,7 @@
                    ('racket
                     (quasisyntax/loc stx (#,(match (target-real-implementation TARGET) ('double #'fl+) ('long-double #'extfl+)) x y)))
                    ('ansi-c
-                    (syntax/loc stx (c+ (to-string x) (to-string y))))))
+                    (syntax/loc stx (cr+ (to-string x) (to-string y))))))
                 ((_ x rest ...)
                  (match (target-lang TARGET)
                    ('racket
@@ -366,7 +367,25 @@
                      stx
                      (#,(match (target-real-implementation TARGET) ('double #'fl+) ('long-double #'extfl+)) x (_rl+ #,@#'(rest ...)))))
                    ('ansi-c
-                    (quasisyntax/loc stx (c+ (to-string x) (_rl+ #,@#'(rest ...)))))))))
+                    (quasisyntax/loc stx (cr+ (to-string x) (_rl+ #,@#'(rest ...)))))))))
+
+(define-syntax (_rld+ stx)
+  (syntax-parse stx
+              ((_ x y)
+               (match (target-lang TARGET)
+                 ('racket
+                  (quasisyntax/loc stx (#,(match (target-real-implementation TARGET) ('double #'fl+) ('long-double #'extfl+)) x y)))
+                 ('ansi-c
+                  (syntax/loc stx (crd+ (to-string x) (to-string y))))))
+              ((_ x rest ...)
+               (match (target-lang TARGET)
+                 ('racket
+                  (quasisyntax/loc
+                   stx
+                   (#,(match (target-real-implementation TARGET) ('double #'fl+) ('long-double #'extfl+)) x (_rld+ #,@#'(rest ...)))))
+                 ('ansi-c
+                  (quasisyntax/loc stx (crd+ (to-string x) (_rld+ #,@#'(rest ...)))))))))
+
 
 (define-syntax (_rl/ stx)
   (syntax-parse stx
@@ -437,6 +456,7 @@
 (define-syntax (_vector-set! stx)
   (syntax-parse stx
                 ((_vector-set! vec idx value)
+
                  (match (target-lang TARGET)
                    ('racket
                     (quasisyntax/loc
