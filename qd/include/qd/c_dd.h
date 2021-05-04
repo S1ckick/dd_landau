@@ -36,8 +36,8 @@ dd c_dd_sub_d_dd(double a, const double *b);
 dd c_dd_sub_dd_d(const double *a, double b);
 
 /* mul */
-dd c_dd_mul(const double *a, const double *b);
-dd c_dd_mul_d_dd(double a, const double *b);
+dd c_dd_mul(dd a, dd b);
+dd c_dd_mul_d_dd(double a, dd b);
 dd c_dd_mul_dd_d(const double *a, double b);
 
 /* div */

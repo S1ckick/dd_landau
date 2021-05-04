@@ -120,7 +120,7 @@
     (if (equal? modifier "")
       (format "~a~a ~a[~a] = ~a;\n" indentation type name size value)
       (format "~a~a ~a ~a[~a] = ~a;\n" indentation modifier type name size value))))
-
+      
 (define (c-declare-array type name size (modifier ""))
   (let ((indentation (offset-string (offset))))
     (if (equal? modifier "")
