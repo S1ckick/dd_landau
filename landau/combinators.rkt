@@ -15,21 +15,21 @@
 (define (offset-string level) (make-string (fx* level indent-step) #\ ))
 
 (define (c+ . x) (format "(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " + ")))
-(define (cr+ . x) (format "c_dd_add(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
-(define (crdl+ . x) (format "c_dd_add_d_dd(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
-(define (crdr+ . x) (format "c_dd_add_dd_d(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (cr+ . x) (format "dd_add(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (crdl+ . x) (format "dd_add_d_dd(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (crdr+ . x) (format "dd_add_dd_d(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
 (define (c- x y) (format "(~a - ~a)" x y))
-(define (cr- x y) (format "c_dd_sub(~a , ~a)" x y))
-(define (crdl- x y) (format "c_dd_sub_d_dd(~a , ~a)" x y))
-(define (crdr- x y) (format "c_dd_sub_dd_d(~a , ~a)" x y))
+(define (cr- x y) (format "dd_sub(~a , ~a)" x y))
+(define (crdl- x y) (format "dd_sub_d_dd(~a , ~a)" x y))
+(define (crdr- x y) (format "dd_sub_dd_d(~a , ~a)" x y))
 (define (c* . x) (format "(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " * ")))
-(define (cr* . x) (format "c_dd_mul(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
-(define (crdl* . x) (format "c_dd_mul_d_dd(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
-(define (crdr* . x) (format "c_dd_mul_dd_d(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (cr* . x) (format "dd_mul(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (crdl* . x) (format "dd_mul_d_dd(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
+(define (crdr* . x) (format "dd_mul_dd_d(~a)" (string-join (map (lambda (y) (format "~a" y)) x) " , ")))
 (define (c/ x y) (format "(~a / ~a)" x y))
-(define (cr/ x y) (format "c_dd_div(~a , ~a)" x y))
-(define (crdl/ x y) (format "c_dd_div_d_dd(~a , ~a)" x y))
-(define (crdr/ x y) (format "c_dd_div_dd_d(~a , ~a)" x y))
+(define (cr/ x y) (format "dd_div(~a , ~a)" x y))
+(define (crdl/ x y) (format "dd_div_d_dd(~a , ~a)" x y))
+(define (crdr/ x y) (format "dd_div_dd_d(~a , ~a)" x y))
 (define (c< x y) (format "(~a < ~a)" x y))
 (define (c> x y) (format "(~a > ~a)" x y))
 (define (c== x y) (format "(~a == ~a)" x y))
@@ -120,7 +120,7 @@
     (if (equal? modifier "")
       (format "~a~a ~a[~a] = ~a;\n" indentation type name size value)
       (format "~a~a ~a ~a[~a] = ~a;\n" indentation modifier type name size value))))
-      
+
 (define (c-declare-array type name size (modifier ""))
   (let ((indentation (offset-string (offset))))
     (if (equal? modifier "")
@@ -198,7 +198,7 @@
 (match (target-real-implementation TARGET)
        ('double (format "((double) ~a)" value))
        ('long-double (format "((long double) ~a)" value))
-       ('double-double (format "((double *) ~a)" value))
+       ('double-double (format "((dd) ~a)" value))
 ))
 
 ;; FIXME use runtime
@@ -230,7 +230,7 @@
 #'(string-append (offset-string (offset)) decl-str)))
 
 (define (prepand-headers src-str)
-  (format "#include <math.h>\n#include \"../qd/include/qd/c_dd.h\"\n\n~a" src-str)
+  (format "#include <math.h>\n#include \"dd.h\"\n\n~a" src-str)
 )
 
 (define/contract

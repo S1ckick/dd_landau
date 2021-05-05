@@ -742,7 +742,7 @@
                                   (to-c-func-param argtype argname-str TARGET)))
                       ", ")))
 
-          (with-syntax ((c-func-pragma (match (target-real-implementation TARGET) ('double "static inline double") ('long-double "static inline long double") ('double-double "static inline double*") )))
+          (with-syntax ((c-func-pragma (match (target-real-implementation TARGET) ('double "static inline double") ('long-double "static inline long double") ('double-double "static inline double") )))
            (quasisyntax/loc
             stx
             (c-func-decl #,#'c-func-pragma #,(syntax->string #'func-name) "" #,c-args (thunk (c-return #,#'body)))))))))))

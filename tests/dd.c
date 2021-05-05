@@ -236,12 +236,12 @@ dd dd_mul_dd_d(dd a, double b) {
 }
 
 /* double * double-double */
-dd dd_mul_d_dd(double a, dd b) { 
+dd dd_mul_d_dd(double a, dd b) {
     return dd_mul_dd_d(b, a);
 }
 /* -----------------END multiplications----------------- */
 
-/* -----------------divosions----------------- */
+/* -----------------divisions----------------- */
 
 /* double-double / double-double */
 dd dd_div(dd a, dd b) {
@@ -253,13 +253,32 @@ dd dd_div(dd a, dd b) {
 }
 
 /* double / double-double */
-dd dd_div_d_dd(double a, dd b) { 
+dd dd_div_d_dd(double a, dd b) {
   dd dd_a = {a, 0};
-  return dd_div(dd_a, b); 
+  return dd_div(dd_a, b);
 }
 
 /* double-double / double */
-dd dd_div_dd_d(dd a, double b) { 
-  dd dd_b = {b, 0};
-  return dd_div(a, dd_b); 
+dd dd_div_dd_d(dd a, double b) {
+  double q1, q2;
+  double p1, p2;
+  double s, e;
+  dd r;
+
+  q1 = a.x / b;   /* approximate quotient. */
+
+  /* Compute  this - q1 * d */
+  p1 = two_prod(q1, b, &p2);
+  s = two_diff(a.x, p1, &e);
+  e += a.y;
+  e -= p2;
+
+  /* get next approximation. */
+  q2 = (s + e) / b;
+
+  /* renormalize */
+  r.x = quick_two_sum(q1, q2, &r.y);
+
+  return r;
+
 }

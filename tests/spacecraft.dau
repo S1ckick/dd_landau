@@ -1,26 +1,6 @@
 #lang landau
 
-parameter[6] initial
-
-real[6] xdot (
-  real[6] x,
-  real GM)
+real test_function_1(real v1, real v2)
 {
-  real[6] state
-  state[ : ] = x[0 : 6]
-
-  real[6] state_dot
-
-  state_dot[ : 3] = state[3 : 6]
-  xdot[ : 3] = state_dot[0 : 3]
-
-  real dist2
-  real dist3inv
-
-  dist2 = sqr(state[0]) + sqr(state[1]) + sqr(state[2])
-  dist3inv = 1 / (dist2 * sqrt(dist2))
-
-  state_dot[3 : 6] = GM * (-state[0 : 3]) * dist3inv
-  xdot[3 : 6] = state_dot[3 : 6]
-
+  test_function_1 = v1 / 2.0
 }
