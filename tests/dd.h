@@ -6,6 +6,8 @@ typedef struct {
   double y;
 } dd;
 
+dd d_dd(double a);
+
 /* add */
 dd dd_add(dd a, dd b);
 dd dd_add_d_dd(double a, dd b);
@@ -26,5 +28,7 @@ dd dd_mul_dd_d(dd a, double b);
 dd dd_div(dd a, dd b);
 dd dd_div_d_dd(double a, dd b);
 dd dd_div_dd_d(dd a, double b);
+
+dd dd_sqrt(dd a);
 
 #endif // DD_H

@@ -1,4 +1,11 @@
 #include "dd.h"
+#include <math.h>
+
+
+dd d_dd(double a){
+  dd b = {a, 0.0};
+  return b;
+}
 
 /*---------------------------HELPERS------------------------------*/
 
@@ -17,6 +24,14 @@ double two_sum(double a, double b, double *err) {
     double bb = s - a;
     *err = (a - (s - bb)) + (b - bb);
     return s;
+}
+
+/* double-double = double + double */
+dd add(double a, double b) {
+  double s, e;
+  s = two_sum(a, b, &e);
+  dd res = {s, e};
+  return res;
 }
 
 /* double-double + double-double */
@@ -94,6 +109,27 @@ double two_prod(double a, double b, double *err) {
 #endif
 }
 
+double two_sqr(double a, double *err) {
+#ifdef QD_FMS
+  double p = a * a;
+  err = QD_FMS(a, a, p);
+  return p;
+#else
+  double hi, lo;
+  double q = a * a;
+  split(a, &hi, &lo);
+  *err = ((hi * hi - q) + 2.0 * hi * lo) + lo * lo;
+  return q;
+#endif
+}
+
+dd sqr(double a) {
+  double p1, p2;
+  p1 = two_sqr(a, &p2);
+  dd res = {p1, p2};
+  return res;
+}
+
 dd sloppy_div(dd a, dd b) {
   double s1, s2;
   double q1, q2;
@@ -133,6 +169,9 @@ dd accurate_div(dd a, dd b) {
   r = dd_add_dd_d(q12, q3);
   return r;
 }
+
+int is_zero(dd a) { return (a.x == 0 && a.y == 0); }
+
 /* ------------ END HELPERS --------------------- */
 
 /* -----------------additions----------------- */
@@ -281,4 +320,18 @@ dd dd_div_dd_d(dd a, double b) {
 
   return r;
 
+}
+/* -----------------END divisions----------------- */
+
+/* sqrt */
+dd dd_sqrt(dd a) {
+  dd res = {0, 0};
+
+  if (is_zero(a)) return res;
+
+  if (a.x < 0) return res;  ///
+
+  double x = 1.0 / sqrt(a.x);
+  double ax = a.x * x;
+  return add(ax, dd_sub(a, sqr(ax)).x * (x * 0.5));
 }

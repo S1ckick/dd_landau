@@ -1,6 +1,0 @@
-#lang landau
-
-real test_function_1(real v1, real v2)
-{
-  test_function_1 = v1 / 2.0
-}

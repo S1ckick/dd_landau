@@ -1,0 +1,43 @@
+#lang landau
+
+
+const int NBodies = 8
+const int PROPS = 7
+
+real[3] forceSub(real[PROPS] body1, real[PROPS] body2){
+  real[3] dist
+  dist[0] = body1[1] - body2[1]
+  dist[1] = body1[2] - body2[2]
+  dist[2] = body1[3] - body2[3]
+  real len = sqrt(dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2])
+  real temp = -(6.6743e-11 * body2[0] / (len * len * len))
+  forceSub[:] = dist[:] * temp
+}
+
+real[NBodies*PROPS] newState(real[NBodies*PROPS] bodies1){
+
+  real[NBodies*PROPS] newBodies
+
+  for i = [0 : NBodies]
+  {
+    real[3] total_force = 0
+    real[PROPS] body1 = bodies1[i*PROPS : i*PROPS+PROPS]
+    for j = [0 : i]
+    {
+      real[PROPS] body2 = bodies1[j*PROPS : j*PROPS+PROPS]
+      real[3] f = forceSub(body1, body2)
+      total_force[:] = total_force[:] + f[:]
+    }
+    for j = [i + 1 : NBodies]
+    {
+      real[PROPS] body2 = bodies1[j*PROPS : j*PROPS+PROPS]
+      real[3] f = forceSub(body1, body2)
+      total_force[:] = total_force[:] + f[:]
+    }
+
+    newBodies[i*PROPS] = bodies1[i*PROPS]
+    newBodies[i*PROPS + 1 : i*PROPS + 4] = bodies1[i*PROPS + 4 : i*PROPS + 7]
+    newBodies[i*PROPS + 4 : i*PROPS + 7] = total_force[:]
+  }
+  newState[:] = newBodies[:]
+}

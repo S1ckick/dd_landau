@@ -498,7 +498,7 @@
                    ('racket
                     (datum->syntax stx `(_rl- _0.0 ,#'x)))
                    ('ansi-c
-                    (syntax/loc stx (c-neg (to-string x))))))))
+                    (syntax/loc stx (c-negd (to-string x))))))))
 
 (define-syntax (_or stx)
   (syntax-parse stx
@@ -609,7 +609,7 @@
                    ('ansi-c
                     (quasisyntax/loc
                      stx
-                     (#,(match (target-real-implementation TARGET) ('double #'c-sqrt) ('long-double #'c-sqrtl) ('double-double #'c-sqrt)) (to-string value))))))))
+                     (#,(match (target-real-implementation TARGET) ('double #'c-sqrt) ('long-double #'c-sqrtl) ('double-double #'c-sqrtd)) (to-string value))))))))
 
 (define-syntax (_sqr stx)
   (syntax-parse stx

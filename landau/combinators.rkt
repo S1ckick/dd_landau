@@ -39,7 +39,9 @@
 (define (c-sqrt x) (format "sqrt(~a)" x))
 (define (c-powl x y) (format "powl(~a, ~a)" x y))
 (define (c-sqrtl x) (format "sqrtl(~a)" x))
+(define (c-sqrtd x) (format "dd_sqrt(~a)" x))
 (define (c-neg x) (format "-~a" x))
+(define (c-negd x) (format "dd_neg(~a)" x))
 (define (c-not x) (format "!~a" x))
 (define (c-or x y) (format "(~a || ~a)" x y))
 (define (c-and x y) (format "(~a && ~a)" x y))
@@ -198,7 +200,7 @@
 (match (target-real-implementation TARGET)
        ('double (format "((double) ~a)" value))
        ('long-double (format "((long double) ~a)" value))
-       ('double-double (format "((dd) ~a)" value))
+       ('double-double (format "d_dd(~a)" value))
 ))
 
 ;; FIXME use runtime
