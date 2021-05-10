@@ -498,7 +498,7 @@
                    ('racket
                     (datum->syntax stx `(_rl- _0.0 ,#'x)))
                    ('ansi-c
-                    (syntax/loc stx (c-negd (to-string x))))))))
+                    (syntax/loc stx (c-neg (to-string x))))))))
 
 (define-syntax (_or stx)
   (syntax-parse stx

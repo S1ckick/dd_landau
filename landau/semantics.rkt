@@ -280,7 +280,7 @@
                     (make-landau-type 'int #f)
                     (make-landau-type 'int #f)
                     (make-landau-type 'int -1)
-                    (make-landau-type 'int -1)))
+                    (make-landau-type 'real -1)))
          (dx-idx (datum->syntax
                   stx
                   `(_int-vector-ref ,#'dx-idxs-mappings
@@ -327,7 +327,7 @@
                                  (make-landau-type 'int #f)
                                  (make-landau-type 'int #f)
                                  (make-landau-type 'int -1)
-                                 (make-landau-type 'int -1)))
+                                 (make-landau-type 'real -1)))
         (get-dfdx-var-name (datum->syntax stx 'get_dfdx_var))
         (dx-idx (datum->syntax
                  stx

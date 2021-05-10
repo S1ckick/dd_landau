@@ -1,43 +1,38 @@
 #lang landau
 
 
-const int NBodies = 8
-const int PROPS = 7
+parameter[6] initial
 
-real[3] forceSub(real[PROPS] body1, real[PROPS] body2){
-  real[3] dist
-  dist[0] = body1[1] - body2[1]
-  dist[1] = body1[2] - body2[2]
-  dist[2] = body1[3] - body2[3]
-  real len = sqrt(dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2])
-  real temp = -(6.6743e-11 * body2[0] / (len * len * len))
-  forceSub[:] = dist[:] * temp
-}
+real[6 + 36 + 6] xdot (
+  real[6 + 36 + 6] x,
+  real GM)
+{
+  real[36] state_derivatives_initial
+  state_derivatives_initial[0 : 36] = x[6 : 6 + 36]
 
-real[NBodies*PROPS] newState(real[NBodies*PROPS] bodies1){
+  real[6] state_derivatives_gm
+  state_derivatives_gm[0 : 6] = x[6 + 36 : 6 + 36 + 6]
 
-  real[NBodies*PROPS] newBodies
+  real[6] state
+  state[ : ] = x[0 : 6]
 
-  for i = [0 : NBodies]
-  {
-    real[3] total_force = 0
-    real[PROPS] body1 = bodies1[i*PROPS : i*PROPS+PROPS]
-    for j = [0 : i]
-    {
-      real[PROPS] body2 = bodies1[j*PROPS : j*PROPS+PROPS]
-      real[3] f = forceSub(body1, body2)
-      total_force[:] = total_force[:] + f[:]
-    }
-    for j = [i + 1 : NBodies]
-    {
-      real[PROPS] body2 = bodies1[j*PROPS : j*PROPS+PROPS]
-      real[3] f = forceSub(body1, body2)
-      total_force[:] = total_force[:] + f[:]
-    }
+  state[ : ] ' initial[ : ] = state_derivatives_initial[0 : 36]
+  state[ : ] ' GM = state_derivatives_gm[0 : 6]
 
-    newBodies[i*PROPS] = bodies1[i*PROPS]
-    newBodies[i*PROPS + 1 : i*PROPS + 4] = bodies1[i*PROPS + 4 : i*PROPS + 7]
-    newBodies[i*PROPS + 4 : i*PROPS + 7] = total_force[:]
-  }
-  newState[:] = newBodies[:]
+  real[6] state_dot
+
+  state_dot[ : 3] = state[3 : 6]
+  xdot[ : 3] = state_dot[0 : 3]
+
+  real dist2
+  real dist3inv
+
+  dist2 = sqr(state[0]) + sqr(state[1]) + sqr(state[2])
+  dist3inv = 1 / (dist2 * sqrt(dist2))
+
+  state_dot[3 : 6] = GM * (-state[0 : 3]) * dist3inv
+  xdot[3 : 6] = state_dot[3 : 6]
+
+  xdot[6 : 6 + 36] = state_dot[ : ] ' initial[ : ]
+  xdot[6 + 36 : 6 + 36 + 6] = state_dot[ : ] ' GM
 }
