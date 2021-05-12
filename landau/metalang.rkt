@@ -119,7 +119,9 @@
 
 (define-syntax (_define-var stx)
   (syntax-parse stx
-                ((_define-var name type)
+                ((_define-var name type is-derivative)
+                (displayln #'name)
+                (displayln #'type)
                  (match (target-lang TARGET)
                    ('racket
                     (with-syntax* ((instantiaton-datum (instantiate #'type)))
@@ -127,8 +129,8 @@
 
                    ('ansi-c
                     (with-syntax ((type-expd (expand-type #'type)))
-                      (quasisyntax/loc stx (c-declare-var #,(syntax->string #'name) #,#'type-expd))))))
-                ((_define-var name type value (~optional const?))
+                      (quasisyntax/loc stx (c-declare-var #,(syntax->string #'name) #,#'type-expd #,#'is-derivative))))))
+                ((_define-var name type is-derivative value (~optional const?))
                  (match (target-lang TARGET)
                    ('racket
                     (quasisyntax/loc stx (define name value)))
@@ -137,7 +139,7 @@
                                    (const?_ (attribute const?)))
                                   (quasisyntax/loc
                                     stx
-                                    (c-declare-var #,(syntax->string #'name) #,#'type-expd #,(if (attribute const?)
+                                    (c-declare-var #,(syntax->string #'name) #,#'type-expd #,#'is-derivative #,(if (attribute const?)
                                                                                                (quote 'static)
                                                                                                (quote 'on-stack))
                                                    (to-string value) #,#'const?_))))))
@@ -145,7 +147,7 @@
 
 (define-syntax (_define-var-with-func-call stx)
   (syntax-parse stx
-                ((_define-var name type func-call)
+                ((_define-var name type is-derivative func-call)
                  (match (target-lang TARGET)
                    ('racket
                     (with-syntax* ((instantiaton-datum (instantiate #'type)))
@@ -157,7 +159,7 @@
                                    (define-var
                                      (quasisyntax/loc
                                       stx
-                                      (c-declare-var #,(syntax->string #'name) #,#'type-expd 'on-stack)))
+                                      (c-declare-var #,(syntax->string #'name) #,#'type-expd #,#'is-derivative #, 'on-stack)))
                                    (func-call-stx #`(c-indent (c-line-end #,#'func-call))))
                       (datum->syntax stx `(_begin
                                            ,#'define-var
@@ -195,7 +197,7 @@
                     (syntax/loc stx (let ((var value)) body)))
                    ('ansi-c
                     (quasisyntax/loc stx (string-append
-                                     (c-declare-var #,(syntax->string #'var) type)
+                                     (c-declare-var #,(syntax->string #'var) type #t)
                                      (c-set #,(syntax->string #'var) (to-string value))
                                      body)))))))
 
@@ -231,7 +233,7 @@
                    ('ansi-c
             ;; TODO: get list of bindings, take one as the loop iterator, iterate other inside body
                     (quasisyntax/loc stx
-                                (c-forever #,(syntax->string #'var-name) start (thunk body))))))))
+                              (c-forever #,(syntax->string #'var-name) start (thunk body))))))))
 
 (define-syntax (_int+ stx)
   (syntax-parse stx

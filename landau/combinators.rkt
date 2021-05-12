@@ -192,7 +192,7 @@
       (format "~a~a ~a[~a] = ~a;\n" indentation type name size value)
       (format "~a~a ~a ~a[~a] = ~a;\n" indentation modifier type name size value))))
 
-(define (c-declare-array type name size (modifier ""))
+(define (Аrray type name size (modifier ""))
   (let ((indentation (offset-string (offset))))
     (if (equal? modifier "")
       (format "~a~a ~a[~a];\n" indentation type name size)
@@ -301,18 +301,22 @@
 #'(string-append (offset-string (offset)) decl-str)))
 
 (define (prepand-headers src-str)
-  (format "#include <math.h>\n#include \"dd.h\"\n\n~a" src-str)
+(match (target-real-implementation TARGET)
+('double (format "#include <math.h>\n\n~a" src-str))
+('long-double (format "#include <math.h>\n\n~a" src-str))
+('double-double (format "#include <math.h>\n#include \"dd.h\"\n\n~a" src-str))
+)
 )
 
 (define/contract
-  (c-declare-var name-str type (modifier-pragma 'on-stack) (value #f) (const? #f))
-  (->* (string? landau-type/c) (any/c any/c boolean?)
+  (c-declare-var name-str type is-derivative (modifier-pragma 'on-stack) (value #f) (const? #f) )
+  (->* (string? landau-type/c boolean?) (any/c any/c boolean?)
        string?)
   (let* ((target_ TARGET)
          (c-real-type (match (target-real-implementation TARGET)
                 ('double "double")
                 ('long-double "long double")
-                ('double-double "dd")
+                ('double-double (if is-derivative "double" "dd"))
          ))
          (indentation (offset-string (offset)))
          ;; NOTE: all real arrays are on stack

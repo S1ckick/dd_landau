@@ -511,7 +511,6 @@
               (type1 (syntax-property expr1_ 'landau-type))
               (type2 (syntax-property expr2_ 'landau-type))
               (op (syntax->datum #'op)))
-
          (let*-values (((expr1 expr2 type) (binary-op-cast expr1_ expr2_ stx))
                       ((expr1-atom) (atom-number expr1))
                       ((expr2-atom) (atom-number expr2))
@@ -563,7 +562,6 @@
                                              (dual-b-derivative (get-derivative-stx #'expanded-dual-expr)))
                                 ;; NOTE: f * n
                                 (if (equal? op "*")
-
                                   (quasisyntax/loc stx
                                               (list
                                                #,(datum->syntax stx `(_rl* ,#'dual-b-value ,#'n))
@@ -1457,8 +1455,9 @@
                             (datum->syntax #f (make-var-der-name func-name-vs
                                                                  dx-name-str))
                             dfdx-type)))
+          (println dfdx-type)
           (datum->syntax stx
-                 `(_define-var ,dual-r-var ,dfdx-type)))))))
+                 `(_define-var ,dual-r-var ,dfdx-type, #t)))))))
 
 (define-syntax (func-body stx)
   (syntax-parse stx
@@ -1634,7 +1633,7 @@
               ((and need-variable (not dual-r-vars))
                (datum->syntax stx
                               `(_begin
-                                (_define-var ,name-sym ,type)
+                                (_define-var ,name-sym ,type, #f)
                                ,assign-if-set)))
 
               ((and need-variable (not (hash-empty? dual-r-vars)))
@@ -1645,8 +1644,9 @@
                              (let* ((dual-r-var (hash-ref dual-r-vars dx-name-str))
                                     (dual-r-var-type (variable-type dual-r-var))
                                     (dual-r-var-symb (variable-symbol dual-r-var)))
+                                    (println dual-r-var-type)
                                    (datum->syntax stx
-                                                  `(_define-var ,dual-r-var-symb ,dual-r-var-type))))))
+                                                  `(_define-var ,dual-r-var-symb ,dual-r-var-type, #t))))))
                 ;  (quasisyntax/loc stx
                 ;                   (#,mbegin
                 ;                    #,(define-var stx name-sym type)
@@ -1654,7 +1654,7 @@
                 ;                    #,assign-if-set))
                  (datum->syntax stx
                                 `(_begin
-                                  (_define-var ,name-sym ,type)
+                                  (_define-var ,name-sym ,type, #f)
                                   (_begin ,@#'der-decl-list)
                                   ,assign-if-set))))
               ;; NOTE: skip declaration if value is not used
@@ -1662,7 +1662,7 @@
                ;; FIXME: keep it For testing
                  (datum->syntax stx
                                 `(_begin
-                                  (_define-var ,name-sym ,type)
+                                  (_define-var ,name-sym ,type, #f)
                                  ,assign-if-set))))))
 
          ('int
@@ -1674,7 +1674,7 @@
                     (name-sym-stx (datum->syntax stx name-sym)))
                (datum->syntax stx
                               `(_begin
-                                (_define-var ,name-sym ,type)
+                                (_define-var ,name-sym ,type, #f)
                                ,assign-if-set))))))
          (else (raise-syntax-error #f "unsupported type. Expect: real[INT] STRING | real STRING | int STRING" stx)))))))
 
@@ -1705,7 +1705,7 @@
                                   (begin
                                    #,(datum->syntax
                                    stx
-                                   `(_define-var ,#'constant-array-stx ,type (_rl-vector ,expanded-list) #t)))))))
+                                   `(_define-var ,#'constant-array-stx ,type (_rl-vector ,expanded-list), #f, #t)))))))
              (else
               (let* ((expanded (local-expand-memo #'value 'expression '()))
                      (value (atom-number expanded))
