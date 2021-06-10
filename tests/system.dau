@@ -6,7 +6,7 @@ const int PROPS = 7
 
 real[3] forceSub(real[PROPS] body1, real[PROPS] body2){
   real[3] dist
-  dist[0] = body1[1] - body2[1]
+  dist[0] = body1[1] - body2[1
   dist[1] = body1[2] - body2[2]
   dist[2] = body1[3] - body2[3]
   real len = sqrt(dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2])
